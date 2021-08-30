@@ -8,6 +8,7 @@ data.columns = ['D', 'S', 'I']
 
 death_rate = []
 number_of_days = []
+# forenklet funksjon for dødsrate
 for i in range(0, len(data)):
     death_rate.append(
         (data['D'].iloc[i] / data['S'].iloc[i]) * 100)
@@ -20,6 +21,6 @@ data.fillna(0)
 print(data)
 
 x = data['days']
-y = data['S']
-plt.plot(x, y, data['death_rate'])
+y = data['I']
+plt.plot(x, y, data['D'])
 plt.show()
