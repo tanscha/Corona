@@ -1,9 +1,9 @@
 import xlrd
 import matplotlib.pyplot as plt
 
-loc = "Covid_deaths.xls"
+loc = "excel/Covid_deaths.xls"
 
-loc2 = "Covid_innlagt.xls"
+loc2 = "excel/Covid_innlagt.xls"
 
 wb = xlrd.open_workbook(loc)
 sheet = wb.sheet_by_index(0)

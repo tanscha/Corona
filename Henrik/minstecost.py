@@ -1,18 +1,18 @@
+import datetime
+
 import matplotlib.pyplot as plt
 import numpy as np
 import xlrd
-from scipy import interpolate
 
 # Spesifiserer hvilke filer som vi henter data fra
-from scipy.interpolate import interp1d
 
-locD = "Covid_deaths.xls"
+locD = "excel/Covid_deaths.xls"
 
 wbD = xlrd.open_workbook(locD)
 sheetD = wbD.sheet_by_index(0)
 sheetD.cell_value(0, 0)
 
-loc = "Covid_innlagt.xls"
+loc = "excel/Covid_innlagt.xls"
 wb = xlrd.open_workbook(loc)
 sheet = wb.sheet_by_index(0)
 sheet.cell_value(0, 0)
@@ -20,10 +20,15 @@ days = []
 innlagt = []
 deaths = []
 
+# ----------- Metoder som henter data fra excel-ark START------------
 def getDate(c,day, sheet):
-    dayvalue = str(sheet.cell_value(day, c))
-    return dayvalue
-
+    dayvalue = sheet.cell_value(day, c)
+    y = dayvalue.split("T")
+    x = y[0].split("-")
+    print(x[0]+"/"+x[1] +"/"+x[2])
+    date = datetime.date(int(x[0]),int(x[1]),int(x[2]))
+    date_time = date.strftime('%Y/%m/%d')
+    return date_time
 
 
 # Metode som henter data fra hver celle i excel
@@ -58,13 +63,24 @@ def getDays(startrad, sluttrad):
             print()
         elif i <= sluttrad:
             days.append(i)
+# ----------- Metoder som henter data fra excel-ark SLUTT------------
 
 
-# Metode som setter opp C(k, d)
+# Metode som interpolerer data for dødsfall til en kontinuerlig funksjon
+def D(t):
+    return np.interp(np.array(t), days, deaths)
+
+
+# Metode som interpolerer data for innlagte til en kontinuerlig funksjon
+def K(t):
+    return np.interp(np.array(t), days, innlagt)
+
+
+# Metode som setter opp funksjonen for C(k, d)
 def CFunction(vektor, k, d, T):
     kVektor = k * K(vektor - d)
     dVektor = D(vektor)
-    return (np.trapz(vektor, (kVektor - dVektor))**2) / (T - d)
+    return (np.trapz((kVektor - dVektor)**2, vektor)) / (T - d)
 
 
 def plotCostFunction(vektor, periode, iterasjoner, start, slutt):
@@ -72,18 +88,18 @@ def plotCostFunction(vektor, periode, iterasjoner, start, slutt):
     global dMin, kMin
     n = 800
     kRange = np.array(np.linspace(0, 0.5, n))
-    dRange = np.array(np.linspace(0, 4, n))
+    dRange = np.array(np.linspace(0, 14, n))
 
     # Finner minste verdi for C med k og d
     CMin = 1000000
     for k in kRange:
         for d in dRange:
-            C = CFunction(vektor, k, d, periode)
-            if C < CMin:
+            C = CFunction(vektor, k, d, periode)                                            # Kaller på funksjonen for C som regner ut eventuelle nye minimums C-er
+            if C < CMin:                                                                    # Hvis funksjonen får en lavere C angir vi nye C, k og d til de nye verdiene
                 CMin = C
                 kMin = k
                 dMin = d
-                print("k: " + str(kMin) + "\td: " + str(dMin) + "\tCMin: " + str(CMin))
+                print("k: " + str(kMin) + "\td: " + str(dMin) + "\tCMin: " + str(CMin))     # Skriver ut de nye verdiene til terminalen
 
     print("Done!")
 
@@ -102,27 +118,30 @@ def plotCostFunction(vektor, periode, iterasjoner, start, slutt):
     plt.show()
 
 
-# Metode som interpolerer data for dødsfall til en kontinuerlig funksjon
-def D(t):
-    return np.interp(np.array(t), days, deaths)
-    #return interp1d(days, deaths, kind = 'cubic')
-
-
-# Metode som interpolerer data for innlagte til en kontineurlig funksjon
-def K(t):
-    return np.interp(np.array(t), days, innlagt)
-    #return interp1d(days, innlagt, kind = 'cubic')
-
-
 if __name__ == "__main__":
     # Setter hvilken dag vi ønsker å starte perioden fra
-    start = 10
+    start = 1
+
     # Setter hvilken dag vi ønsker å slutte perioden på
-    slutt = 101
+    slutt = 60
+
+    # Setter hvor mange dager som dataene blir sett over
     periode = slutt - start + 1
+
+    # Angir hvor mange iterasjoner som jeg ønsker å ha for tidsrommet som blir sett på
     iterasjoner = periode * 6
+
+    # Oppretter en vektor med parameterene som ble opprettet ovenfor
     vektor = np.array(np.linspace(0, periode, iterasjoner))
+
+    # Henter antall dager fra excel ark og legger det i et array
     getDays(start, slutt)
+
+    # Henter antall innlagte (kumulativt) fra excel ark og legger det i et array
     getInnlagt(start, slutt)
+
+    # Henter antall døde (kumulativt) fra excel ark og legger det i et array
     getDeaths(start, slutt)
+
+    # Starter utregningsprosessen og plottingen av dataene
     plotCostFunction(vektor, periode, iterasjoner, start, slutt)
