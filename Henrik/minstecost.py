@@ -20,14 +20,14 @@ days = []
 innlagt = []
 deaths = []
 
+
 # ----------- Metoder som henter data fra excel-ark START------------
-def getDate(c,day, sheet):
+def getDate(c, day, sheet):
     dayvalue = sheet.cell_value(day, c)
     y = dayvalue.split("T")
     x = y[0].split("-")
-    print(x[0]+"/"+x[1] +"/"+x[2])
-    date = datetime.date(int(x[0]),int(x[1]),int(x[2]))
-    date_time = date.strftime('%Y/%m/%d')
+    date = datetime.date(int(x[0]), int(x[1]), int(x[2]))
+    date_time = date.strftime('%d/%m/%Y')
     return date_time
 
 
@@ -63,6 +63,8 @@ def getDays(startrad, sluttrad):
             print()
         elif i <= sluttrad:
             days.append(i)
+
+
 # ----------- Metoder som henter data fra excel-ark SLUTT------------
 
 
@@ -80,7 +82,7 @@ def K(t):
 def CFunction(vektor, k, d, T):
     kVektor = k * K(vektor - d)
     dVektor = D(vektor)
-    return (np.trapz((kVektor - dVektor)**2, vektor)) / (T - d)
+    return (np.trapz((kVektor - dVektor) ** 2, vektor)) / (T - d)
 
 
 def plotCostFunction(vektor, periode, iterasjoner, start, slutt):
@@ -94,12 +96,14 @@ def plotCostFunction(vektor, periode, iterasjoner, start, slutt):
     CMin = 1000000
     for k in kRange:
         for d in dRange:
-            C = CFunction(vektor, k, d, periode)                                            # Kaller på funksjonen for C som regner ut eventuelle nye minimums C-er
-            if C < CMin:                                                                    # Hvis funksjonen får en lavere C angir vi nye C, k og d til de nye verdiene
+            C = CFunction(vektor, k, d,
+                          periode)  # Kaller på funksjonen for C som regner ut eventuelle nye minimums C-er
+            if C < CMin:  # Hvis funksjonen får en lavere C angir vi nye C, k og d til de nye verdiene
                 CMin = C
                 kMin = k
                 dMin = d
-                print("k: " + str(kMin) + "\td: " + str(dMin) + "\tCMin: " + str(CMin))     # Skriver ut de nye verdiene til terminalen
+                print("k: " + str(kMin) + "\td: " + str(dMin) + "\tCMin: " + str(
+                    CMin))  # Skriver ut de nye verdiene til terminalen
 
     print("Done!")
 
@@ -112,8 +116,8 @@ def plotCostFunction(vektor, periode, iterasjoner, start, slutt):
 
     # Plotter k*K(t-d)
     plt.plot(plotvektor, kMin * K(plotvektor - dMin), 'r--')
-    plt.title("k: " + str(kMin) + " / d: " + str(dMin) + "/ CMin: " + str(CMin))
-    plt.xlabel("Døgn ("+str(getDate(0, start, sheet))+"-"+str(getDate(0, slutt, sheet)+")"))
+    plt.title("k = " + str(kMin) + "\nd = " + str(dMin) + "\nCMin = " + str(CMin))
+    plt.xlabel("Døgn (" + str(getDate(0, start, sheet)) + "-" + str(getDate(0, slutt, sheet) + ")"))
     plt.legend(['D(t)', 'k*K(t-d)'])
     plt.show()
 
