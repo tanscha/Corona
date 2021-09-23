@@ -12,7 +12,7 @@ data = pd.read_excel('data.xlsx')
 def interpolering_d(t):
     xvektor = np.array(data.iloc[:, 0])
     yvektor = np.array(data.iloc[:, 1])
-    if (t < np.min(xvektor)).all():
+    if (t < 0).all():
         print('x kan ikke være mindre enn ' + str(np.min(xvektor)))
     elif (t > np.max(xvektor)).all():
         print('x kan ikke være større enn ' + str(np.max(xvektor)))
@@ -24,7 +24,7 @@ def interpolering_d(t):
 def interpolering_k(t):
     xvektor = np.array(data.iloc[:, 0])
     yvektor = np.array(np.cumsum(data.iloc[:, 3]))
-    if (t < np.min(xvektor)).all():
+    if (t < 0).all():
         print('x kan ikke være mindre enn ' + str(np.min(xvektor)))
     elif (t > np.max(xvektor)).all():
         print('x kan ikke være større enn ' + str(np.max(xvektor)))
@@ -33,7 +33,6 @@ def interpolering_k(t):
 
 
 def plott_d():
-    print('hei1')
     xvektor = data.iloc[:, 1]
     yvektor = data.iloc[:, 2]
     plt.plot(xvektor, yvektor)
@@ -44,7 +43,6 @@ def plott_d():
 
 
 def plott_k():
-    print('hei2')
     xvektor = data.iloc[:, 1]
     yvektor = data.iloc[:, 4]
     plt.plot(xvektor, yvektor)
@@ -54,18 +52,18 @@ def plott_k():
     plt.show()
 
 
-def cost_function(k, d):
-    vektor = np.array(np.linspace(d, 310, 10000))
+def cost_function(k, d, start, slutt, periode):
+    vektor = np.linspace(start, slutt, 200)
     kvektor = k * interpolering_k(vektor - d)
     dvektor = interpolering_d(vektor)
 
-
-    return (np.trapz(vektor, (kvektor - dvektor) ** 2))/(365 - d)
-
+    return (np.trapz((kvektor - dvektor) ** 2, vektor))/(periode - d)
 
 
-def plot_cost_function():
-    n = 400
+cost_function.counter = 0
+
+
+def plot_cost_function(vektor, periode, iterasjoner, start, slutt):
     # plotvektor = np.array(np.linspace(0, 365, n))
     # plt.plot(plotvektor, interpolering_d(plotvektor))
     # plt.plot(plotvektor, interpolering_k(plotvektor))
@@ -73,7 +71,7 @@ def plot_cost_function():
     # plt.show()
 
     dvektor = np.array(np.linspace(0, 10, 800))
-    kvektor = np.array(np.linspace(0, 10, 800))
+    kvektor = np.array(np.linspace(0, 0.5, 800))
 
     # lengde_d = max(dvektor.shape)
     # lengde_k = max(kvektor.shape)
@@ -87,15 +85,17 @@ def plot_cost_function():
     #         d_indeks = d_indeks + 1
     #     k_indeks = k_indeks + 1
 
-    c_min = 10000
+    c_min = 70000
     for k in kvektor:
         for d in dvektor:
-            c = cost_function(k, d)
-            print(c)
-            if c < c_min:
+            c = cost_function(k, d, start, slutt, periode)
+            if c_min > c >= 0:
                 c_min = c
                 k_min = k
                 d_min = d
+                print(c_min)
+                print(k_min)
+                print(d_min)
 
     print(k_min)
     print(d_min)
@@ -117,12 +117,17 @@ def plot_cost_function():
     # plt.ylabel('d')
     # plt.show()
 
-    plotvektor = np.array(np.linspace(d_min, 310, n))
-    plt.plot(plotvektor, np.array(float(k_min) * interpolering_k(plotvektor - float(d_min))))
-    plt.plot(plotvektor, interpolering_d(plotvektor))
+    plt.plot(vektor, np.array(float(k_min) * interpolering_k(vektor - float(d_min))))
+    plt.plot(vektor, interpolering_d(vektor))
     plt.xlabel('plotvektor')
     plt.show()
+    print('ferdig')
 
 
 if __name__ == '__main__':
-    plot_cost_function()
+    start = 1
+    slutt = 365
+    periode = slutt - start + 1
+    iterasjoner = periode * 6
+    plotvektor = np.array(np.linspace(start, slutt, iterasjoner))
+    plot_cost_function(plotvektor, periode, iterasjoner, start, slutt)
