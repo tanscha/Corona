@@ -14,11 +14,8 @@ def interpolering_d(t):
     yvektor = np.array(data.iloc[:, 1])
     if (t < 0).all():
         print('x kan ikke være mindre enn ' + str(np.min(xvektor)))
-    elif (t > np.max(xvektor)).all():
-        print('x kan ikke være større enn ' + str(np.max(xvektor)))
 
     return np.interp(np.array(t), xvektor, yvektor)
-
 
 
 def interpolering_k(t):
@@ -26,8 +23,6 @@ def interpolering_k(t):
     yvektor = np.array(np.cumsum(data.iloc[:, 3]))
     if (t < 0).all():
         print('x kan ikke være mindre enn ' + str(np.min(xvektor)))
-    elif (t > np.max(xvektor)).all():
-        print('x kan ikke være større enn ' + str(np.max(xvektor)))
 
     return np.interp(np.array(t), xvektor, yvektor)
 
@@ -52,15 +47,15 @@ def plott_k():
     plt.show()
 
 
-def cost_function(k, d, start, slutt, periode):
-    vektor = np.linspace(start, slutt, 200)
-    kvektor = k * interpolering_k(vektor - d)
+def cost_function(k, d):
+    periode = 365 - 1
+    vektor = np.linspace(0, 365, 20000)
+    kvektor = k * interpolering_k((vektor-d))
     dvektor = interpolering_d(vektor)
 
-    return (np.trapz((kvektor - dvektor) ** 2, vektor))/(periode - d)
+    cost = (np.trapz((kvektor - dvektor) ** 2, vektor))/(periode-d)
 
-
-cost_function.counter = 0
+    return cost
 
 
 def plot_cost_function(vektor, periode, iterasjoner, start, slutt):
@@ -85,43 +80,74 @@ def plot_cost_function(vektor, periode, iterasjoner, start, slutt):
     #         d_indeks = d_indeks + 1
     #     k_indeks = k_indeks + 1
 
-    c_min = 70000
-    for k in kvektor:
-        for d in dvektor:
-            c = cost_function(k, d, start, slutt, periode)
-            if c_min > c >= 0:
-                c_min = c
-                k_min = k
-                d_min = d
-                print(c_min)
-                print(k_min)
-                print(d_min)
+    # c_min = 70000
+    # for k in kvektor:
+    #     for d in dvektor:
+    #         c = cost_function(k, d, start, slutt, periode)
+    #         if c_min > c >= 0:
+    #             c_min = c
+    #             k_min = k
+    #             d_min = d
+    #             print(c_min)
+    #             print(k_min)
+    #             print(d_min)
 
-    print(k_min)
-    print(d_min)
+    # print(k_min)
+    # print(d_min)
+    gamm = 0.000000001
+    hd = 0.1
+    hk = 0.1
+    C = 6000
+    Cny = 7000
+    k = 0.02
+    d = 4.5
+    iter=0
 
-    # fig = plt.figure()
-    # ax = fig.gca(projection='3d')
-    # ax.plot_trisurf(kvektor, dvektor, cost_matrise, rstride=1, cstride=1, antialiased=True)
-    # plt.title('C(k,d)')
-    # plt.xlabel('k')
-    # plt.ylabel('d')
-    # plt.show()
+    while np.abs(Cny-C) > 1e-6:
+        print('while')
+        C = Cny
+        cdx = (cost_function(k+hk, d) - cost_function(k-hk, d))/(2*hk)
+        cdy = (cost_function(k, d+hd) - cost_function(k, d-hd))/(2*hd)
+        k = k - gamm*cdx
+        print('k: ', k)
+        d = d - gamm*cdy
+        print('d: ', d)
+        Cny = cost_function(k, d)
+        print('C: ', Cny)
+        iter = iter + 1
 
-    # fig2 = plt.figure()
-    # kvektor, dvektor = np.meshgrid(kvektor, dvektor)
-    # plt.pcolor(kvektor, dvektor, np.log(cost_matrise))
-    # colorbar()
-    # plt.title('ln C(k,d)')
-    # plt.xlabel('k')
-    # plt.ylabel('d')
-    # plt.show()
-
-    plt.plot(vektor, np.array(float(k_min) * interpolering_k(vektor - float(d_min))))
+    print('iterasjoner: ', iter)
+    print(k, d)
+    plt.plot(vektor, np.array(k * interpolering_k(vektor - d)))
     plt.plot(vektor, interpolering_d(vektor))
-    plt.xlabel('plotvektor')
+    plt.xlabel('Døgn')
+    plt.legend(['k*K(t-d)', 'D(t)'])
+    plt.title('k: '+ str(k) + '\nd: ' + str(d) + '\niterasjoner: ' + str(iter))
+    plt.tight_layout()
     plt.show()
     print('ferdig')
+
+
+# def steepest_descent():
+#     gamm = 0.0001
+#     h = 1e-4
+#     C = 6000
+#     Cny = 7000
+#     k = 0.1
+#     d = 4
+#     iter=0
+#
+#     while np.abs(Cny - C) > 1e-8:
+#         print('while')
+#         C = Cny
+#         cdx = (cost_function(k+h, d) - cost_function(k-h, d))/(2*h)
+#         cdy = (cost_function(k, d+h) - cost_function(k, d-h))/(2*h)
+#         k = k - gamm*cdx
+#         print('k: ', k)
+#         d = d - gamm*cdy
+#         print('d: ', d)
+#         Cny = cost_function(k, d)
+#         print('C: ', Cny)
 
 
 if __name__ == '__main__':
@@ -130,4 +156,5 @@ if __name__ == '__main__':
     periode = slutt - start + 1
     iterasjoner = periode * 6
     plotvektor = np.array(np.linspace(start, slutt, iterasjoner))
+    #steepest_descent()
     plot_cost_function(plotvektor, periode, iterasjoner, start, slutt)

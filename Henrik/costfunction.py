@@ -6,7 +6,7 @@ import xlrd
 import interpolation_innlagt
 import interpolation_deaths
 
-loc1 = "Covid_innlagt.xls"
+loc1 = "excel/Covid_innlagt.xls"
 
 wb1 = xlrd.open_workbook(loc1)
 sheet1 = wb1.sheet_by_index(0)
