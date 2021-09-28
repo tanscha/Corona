@@ -12,7 +12,7 @@ wb1 = xlrd.open_workbook(loc1)
 sheet1 = wb1.sheet_by_index(0)
 sheet1.cell_value(0, 0)
 
-loc2 = "Covid_deaths.xls"
+loc2 = "excel/Covid_deaths.xls"
 
 wb2 = xlrd.open_workbook(loc2)
 sheet2 = wb2.sheet_by_index(0)
