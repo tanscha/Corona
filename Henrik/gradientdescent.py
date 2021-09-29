@@ -1,7 +1,6 @@
-import datetime
-
 import matplotlib.pyplot as plt
 import numpy as np
+import datetime
 import xlrd
 
 # Spesifiserer hvilke filer som vi henter data fra
@@ -19,6 +18,8 @@ sheet.cell_value(0, 0)
 days = []
 innlagt = []
 deaths = []
+start = 0
+slutt = 0
 
 
 # ----------- Metoder som henter data fra excel-ark START------------
@@ -30,6 +31,43 @@ def getDate(c, day, sheet):
     date_time = date.strftime('%d/%m/%Y')
     return date_time
 
+
+def findStartDate(sheet):
+    global start
+    startdate = input("Hvilken dato ønsker du å starte fra? (format må være dd.mm.yyyy)")
+    for i in range(sheet.nrows):
+
+        if sheetD.cell_value(i, 0) == "Date":
+            i = 1
+        dayvalue = sheet.cell_value(i, 0)
+        y = dayvalue.split("T")
+        x = y[0].split("-")
+        date = x[2] + "."+x[1]+"."+x[0]
+        if date == startdate:
+            print(date + " = " + str(i))
+            start = i
+            break
+    else:
+        print("Ikke gyldig dato!")
+        findStartDate(sheet)
+
+def findEndDate(sheet):
+    global slutt
+    enddate = input("Hvilken dato ønsker du å slutte på? (format må være dd.mm.yyyy)")
+    for i in range(sheet.nrows):
+        if sheetD.cell_value(i, 0) == "Date":
+            i = 1
+        dayvalue = sheet.cell_value(i, 0)
+        y = dayvalue.split("T")
+        x = y[0].split("-")
+        date = x[2] + "."+x[1]+"."+x[0]
+        if date == enddate:
+            print(date + " = " + str(i))
+            slutt = i
+            break
+    else:
+        print("Ikke gyldig dato!")
+        findEndDate(sheet)
 
 # Metode som henter data fra hver celle i excel
 def getNum(i, c, sheet):
@@ -130,10 +168,10 @@ def plotGradientDescent(vektor, periode, iterasjoner, start, slutt):
 
 if __name__ == "__main__":
     # Setter hvilken dag vi ønsker å starte perioden fra
-    start = 1
+    findStartDate(sheet)
 
     # Setter hvilken dag vi ønsker å slutte perioden på
-    slutt = 100
+    findEndDate(sheet)
 
     # Setter hvor mange dager som dataene blir sett over
     periode = slutt - start + 1
@@ -142,14 +180,14 @@ if __name__ == "__main__":
     iterasjoner = 565
 
     # Oppretter en vektor med parameterene som ble opprettet ovenfor
-    vektor = np.array(np.linspace(0, periode, iterasjoner))
+    vektor = np.array(np.linspace(start, slutt, iterasjoner))
 
     # Henter antall dager fra excel ark og legger det i et array
     getDays(start, slutt)
 
     # Henter antall innlagte (kumulativt) fra excel ark og legger det i et array
     getInnlagt(start, slutt)
-
+    print(innlagt)
     # Henter antall døde (kumulativt) fra excel ark og legger det i et array
     getDeaths(start, slutt)
 

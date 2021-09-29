@@ -119,15 +119,16 @@ def plotCostFunction(vektor, periode, iterasjoner, start, slutt):
     plt.title("k = " + str(kMin) + "\nd = " + str(dMin) + "\nCMin = " + str(CMin))
     plt.xlabel("Døgn (" + str(getDate(0, start, sheet)) + "-" + str(getDate(0, slutt, sheet) + ")"))
     plt.legend(['D(t)', 'k*K(t-d)'])
+    plt.tight_layout()
     plt.show()
 
 
 if __name__ == "__main__":
     # Setter hvilken dag vi ønsker å starte perioden fra
-    start = 1
+    start = 316
 
     # Setter hvilken dag vi ønsker å slutte perioden på
-    slutt = 60
+    slutt = 565
 
     # Setter hvor mange dager som dataene blir sett over
     periode = slutt - start + 1

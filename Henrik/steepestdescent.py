@@ -11,8 +11,8 @@ dataInn = pd.read_excel('excel/Covid_innlagt.xls')
 
 
 def interpolering_d(t):
-    xvektor = np.array(dataD.iloc[:, 0])
-    yvektor = np.array(dataD.iloc[:, 1])
+    xvektor = np.array(dataD.iloc[:, 3])
+    yvektor = np.array(dataD.iloc[:, 2])
     if (t < 0).all():
         print('x kan ikke være mindre enn ' + str(np.min(xvektor)))
 
@@ -20,37 +20,15 @@ def interpolering_d(t):
 
 
 def interpolering_k(t):
-    xvektor = np.array(dataInn.iloc[:, 0])
-    yvektor = np.array(np.cumsum(dataInn.iloc[:, 3]))
+    xvektor = np.array(dataInn.iloc[:, 4])
+    yvektor = np.array(np.cumsum(dataInn.iloc[:, 1]))
     if (t < 0).all():
         print('x kan ikke være mindre enn ' + str(np.min(xvektor)))
 
     return np.interp(np.array(t), xvektor, yvektor)
 
-
-def plott_d():
-    xvektor = data.iloc[:, 1]
-    yvektor = data.iloc[:, 2]
-    plt.plot(xvektor, yvektor)
-    xdata = np.linspace(min(xvektor), max(xvektor), 200)
-    ydata = interpolering_d(xdata)
-    plt.plot(xdata, ydata)
-    plt.show()
-
-
-def plott_k():
-    xvektor = data.iloc[:, 1]
-    yvektor = data.iloc[:, 4]
-    plt.plot(xvektor, yvektor)
-    xdata = np.linspace(min(xvektor), max(xvektor), 200)
-    ydata = interpolering_d(xdata)
-    plt.plot(xdata, ydata)
-    plt.show()
-
-
-def cost_function(k, d):
-    periode = 365 - 1
-    vektor = np.linspace(0, 365, 20000)
+def cost_function(k, d, periode):
+    vektor = np.linspace(0, periode , 800)
     kvektor = k * interpolering_k((vektor-d))
     dvektor = interpolering_d(vektor)
 
@@ -72,13 +50,13 @@ def plot_cost_function(vektor, periode, iterasjoner, start, slutt):
     while np.abs(Cny-C) > 1e-6:
         print('while')
         C = Cny
-        cdx = (cost_function(k+hk, d) - cost_function(k-hk, d))/(2*hk)
-        cdy = (cost_function(k, d+hd) - cost_function(k, d-hd))/(2*hd)
+        cdx = (cost_function(k+hk, d, periode) - cost_function(k-hk, d, periode))/(2*hk)
+        cdy = (cost_function(k, d+hd, periode) - cost_function(k, d-hd, periode))/(2*hd)
         k = k - gamm*cdx
         print('k: ', k)
         d = d - gamm*cdy
         print('d: ', d)
-        Cny = cost_function(k, d)
+        Cny = cost_function(k, d, periode)
         print('C: ', Cny)
         iter = iter + 1
 
@@ -95,10 +73,12 @@ def plot_cost_function(vektor, periode, iterasjoner, start, slutt):
 
 
 if __name__ == '__main__':
-    start = 1
-    slutt = 365
+    start = 316
+    slutt = 565
     periode = slutt - start + 1
     iterasjoner = periode * 6
-    plotvektor = np.array(np.linspace(start, slutt, iterasjoner))
+    plotvektor = np.array(np.linspace(0, periode, iterasjoner))
     #steepest_descent()
     plot_cost_function(plotvektor, periode, iterasjoner, start, slutt)
+    print(dataD)
+    print(dataInn)
