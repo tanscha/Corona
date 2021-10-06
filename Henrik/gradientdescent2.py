@@ -69,6 +69,7 @@ def findEndDate(sheet):
         print("Ikke gyldig dato!")
         findEndDate(sheet)
 
+
 # Metode som henter data fra hver celle i excel
 def getNum(i, c, sheet):
     positiv = int(sheet.cell_value(i, c))
@@ -105,94 +106,75 @@ def getDays(startrad, sluttrad):
 
 # ----------- Metoder som henter data fra excel-ark SLUTT------------
 
-
-# Metode som interpolerer data for dødsfall til en kontinuerlig funksjon
 def D(t):
-    return np.interp(np.array(t), days, deaths)
+    return (np.interp(t, days, deaths))
 
 
-# Metode som interpolerer data for innlagte til en kontinuerlig funksjon
 def K(t):
-    return np.interp(np.array(t), days, innlagt)
+    return (np.interp(t, days, innlagt))
 
+def C(t, k, d, T):
+    kVektor = k * K(t-d)
+    dVektor = D(t)
+    return (np.trapz((kVektor-dVektor)**2, t)) / (T-d)
 
-# Metode som setter opp funksjonen for C(k, d)
-def CFunction(vektor, k, d, T):
-    kVektor = k * K(vektor - d)
-    dVektor = D(vektor)
-    return (np.trapz((kVektor - dVektor) ** 2, vektor)) / (T - d)
+def partialDerivK(t, k, d, T, h):
+    return (C(t, k+h, d, T)-C(t, k-h, d , T)) / (2*h)
 
+def partialDerivD(t, k, d, T, h):
+    return (C(t, k, d+h, T)-C(t, k, d-h, T)) / (2*h)
 
-def partialDerivK(vektor, k, d, T, h):
-    return (CFunction(vektor, k+h, d, T)-CFunction(vektor, k-h, d, T))/(2*h)
-
-
-def partialDerivD(vektor, k, d, T, h):
-    return (CFunction(vektor, k, d+h, T)-CFunction(vektor, k, d-h, T))/(2*h)
-
-
-def plotGradientDescent(vektor, periode, iterasjoner, start, slutt):
+def plotSteepestDescent(t, periode, start, slutt):
     gammk = 0.000000001
     gammd = 0.001
-    hd = 0.1
     hk = 0.1
-    C = 6000
+    hd = 0.1
+    Cg = 6000
     Cny = 7000
     k = 0.02
     d = 10
-    iter=0
+    iter = 0
 
-    while np.abs(Cny-C) > 0.000001:
-        print('while')
-        C = Cny
-        #cdx = (CFunction(vektor, k, d, periode, hk) - CFunction(vektor, k, d, periode, hk))/(2*hk)
-        #cdy = (CFunction(vektor, k, d, periode, hd) - CFunction(vektor, k, d, periode, hd))/(2*hd)
-        cdk = partialDerivK(vektor, k, d, periode, hk)
-        cdd = partialDerivD(vektor, k, d, periode, hd)
+    while np.abs(Cny-Cg) > 0.000001:
+        Cg = Cny
+        cdk = partialDerivK(t, k, d, periode, hk)
+        cdd = partialDerivD(t, k, d, periode, hd)
         k = k - gammk*cdk
-        print('k: ', k)
         d = d - gammd*cdd
-        print('d: ', d)
-        Cny = CFunction(vektor, k, d, periode)
-        print('C: ', Cny)
-        iter = iter + 1
+        Cny = C(t, k, d , periode)
+        print('k: '+str(k) + "\td: "+str(d)+"\tC: "+str(Cny))
+        iter = iter+1
 
-    print('iterasjoner: ', iter)
+    print("interasjoner: "+str(iter))
     print(k, d)
-    plt.plot(vektor, np.array(k * K(vektor - d)))
-    plt.plot(vektor, D(vektor))
+    plt.plot(t, np.array(k*K(t-d)))
+    plt.plot(t, D(t))
     plt.xlabel("Døgn (" + str(getDate(0, start, sheet)) + "-" + str(getDate(0, slutt, sheet) + ")"))
     plt.legend(['k*K(t-d)', 'D(t)'])
-    plt.title('k: '+ str(k) + '\nd: ' + str(d) + '\niterasjoner: ' + str(iter))
+    plt.title('k: ' + str(k) + '\nd: ' + str(d) + '\nC: ' + str(Cny) + '\niterasjoner: ' + str(iter))
     plt.tight_layout()
     plt.show()
-    print('ferdig')
 
 
 if __name__ == "__main__":
-    # Setter hvilken dag vi ønsker å starte perioden fra
     findStartDate(sheet)
-
-    # Setter hvilken dag vi ønsker å slutte perioden på
     findEndDate(sheet)
 
-    # Setter hvor mange dager som dataene blir sett over
-    periode = slutt - start + 1
+    #k = float(input("Hva er k?"))
+    #d = float(input("Hva er d?"))
 
-    # Angir hvor mange iterasjoner som jeg ønsker å ha for tidsrommet som blir sett på
-    iterasjoner = 565
+    vektor = np.linspace(start, slutt, 565)
 
-    # Oppretter en vektor med parameterene som ble opprettet ovenfor
-    vektor = np.array(np.linspace(start, slutt, iterasjoner))
-
-    # Henter antall dager fra excel ark og legger det i et array
     getDays(1, 565)
-
-    # Henter antall innlagte (kumulativt) fra excel ark og legger det i et array
     getInnlagt(1, 565)
-    print(innlagt)
-    # Henter antall døde (kumulativt) fra excel ark og legger det i et array
     getDeaths(1, 565)
 
-    # Starter utregningsprosessen og plottingen av dataene
-    plotGradientDescent(vektor, periode, iterasjoner, start, slutt)
+    plotSteepestDescent(vektor, slutt-start+1, start, slutt)
+
+    # print(days)
+    # print(innlagt)
+    # print(deaths)
+    #
+    # plt.plot(vektor, k*K(vektor-d))
+    # plt.plot(vektor, D(vektor))
+    # plt.show()
