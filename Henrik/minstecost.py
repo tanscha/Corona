@@ -3,6 +3,7 @@ import datetime
 import matplotlib.pyplot as plt
 import numpy as np
 import xlrd
+import time
 
 # Spesifiserer hvilke filer som vi henter data fra
 
@@ -88,9 +89,10 @@ def CFunction(vektor, k, d, T):
 def plotCostFunction(vektor, periode, iterasjoner, start, slutt):
     # Vektorer med parameterverdier
     global dMin, kMin
-    n = 800
-    kRange = np.array(np.linspace(0, 0.5, n))
-    dRange = np.array(np.linspace(0, 14, n))
+    n = 1600
+    kRange = np.array(np.linspace(0.02, 0.022, n))
+    dRange = np.array(np.linspace(2.8, 2.9, n))
+    iter = 0
 
     # Finner minste verdi for C med k og d
     CMin = 1000000
@@ -104,31 +106,34 @@ def plotCostFunction(vektor, periode, iterasjoner, start, slutt):
                 dMin = d
                 print("k: " + str(kMin) + "\td: " + str(dMin) + "\tCMin: " + str(
                     CMin))  # Skriver ut de nye verdiene til terminalen
+            iter = iter + 1
 
     print("Done!")
 
-    # Plotter D(t)
+
     plotvektor = np.array(np.linspace(dMin, periode, iterasjoner))
-    plt.plot(plotvektor, D(plotvektor), 'b-')
+    # Plotter D(t)
+    plt.plot(plotvektor, D(plotvektor))
+    # Plotter k*K(t-d)
+    plt.plot(plotvektor, kMin * K(plotvektor - dMin))
 
     print("k-verdien som gir minst C(k,d) er " + str(kMin))
     print("d-verdien som gir minst C(k,d) er " + str(dMin))
-
-    # Plotter k*K(t-d)
-    plt.plot(plotvektor, kMin * K(plotvektor - dMin), 'r--')
     plt.title("k = " + str(kMin) + "\nd = " + str(dMin) + "\nCMin = " + str(CMin))
     plt.xlabel("Døgn (" + str(getDate(0, start, sheet)) + "-" + str(getDate(0, slutt, sheet) + ")"))
-    plt.legend(['D(t)', 'k*K(t-d)'])
+    plt.legend([ 'D(t)', 'k*K(t-d)'])
     plt.tight_layout()
     plt.show()
+    print("iterasjoner: "+str(iter))
 
 
 if __name__ == "__main__":
+    start_time = time.time()
     # Setter hvilken dag vi ønsker å starte perioden fra
-    start = 316
+    start = 1
 
     # Setter hvilken dag vi ønsker å slutte perioden på
-    slutt = 565
+    slutt = 315
 
     # Setter hvor mange dager som dataene blir sett over
     periode = slutt - start + 1
@@ -150,3 +155,5 @@ if __name__ == "__main__":
 
     # Starter utregningsprosessen og plottingen av dataene
     plotCostFunction(vektor, periode, iterasjoner, start, slutt)
+
+    print("-------- %s seconds --------" % (time.time()-start_time))
