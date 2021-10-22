@@ -2,16 +2,17 @@ import matplotlib.pyplot as plt
 import numpy as np
 import datetime
 import xlrd
+import time
 
 # Spesifiserer hvilke filer som vi henter data fra
 
-locD = "excel/Covid_deaths.xls"
+locD = "../excel/Covid_deaths.xls"
 
 wbD = xlrd.open_workbook(locD)
 sheetD = wbD.sheet_by_index(0)
 sheetD.cell_value(0, 0)
 
-loc = "excel/Covid_innlagt.xls"
+loc = "../excel/Covid_innlagt.xls"
 wb = xlrd.open_workbook(loc)
 sheet = wb.sheet_by_index(0)
 sheet.cell_value(0, 0)
@@ -36,7 +37,6 @@ def findStartDate(sheet):
     global start
     startdate = input("Hvilken dato ønsker du å starte fra? (format må være dd.mm.yyyy)")
     for i in range(sheet.nrows):
-
         if sheetD.cell_value(i, 0) == "Date":
             i = 1
         dayvalue = sheet.cell_value(i, 0)
@@ -116,7 +116,7 @@ def K(t):
 def C(t, k, d, T):
     kVektor = k * K(t-d)
     dVektor = D(t)
-    return (np.trapz((kVektor-dVektor)**2, t)) / (T-d)
+    return (np.trapz((kVektor-dVektor)**2, t))
 
 def partialDerivK(t, k, d, T, h):
     return (C(t, k+h, d, T)-C(t, k-h, d , T)) / (2*h)
@@ -125,14 +125,14 @@ def partialDerivD(t, k, d, T, h):
     return (C(t, k, d+h, T)-C(t, k, d-h, T)) / (2*h)
 
 def plotSteepestDescent(t, periode, start, slutt):
-    gammk = 0.000000001
-    gammd = 0.001
-    hk = 0.1
+    gammk = 1e-12
+    gammd = 0 #1e-4
+    hk = 1e-3
     hd = 0.1
     Cg = 6000
     Cny = 7000
     k = 0.02
-    d = 10
+    d = 0 #10
     iter = 0
 
     while np.abs(Cny-Cg) > 0.000001:
@@ -147,10 +147,10 @@ def plotSteepestDescent(t, periode, start, slutt):
 
     print("interasjoner: "+str(iter))
     print(k, d)
-    plt.plot(t, np.array(k*K(t-d)))
     plt.plot(t, D(t))
+    plt.plot(t, np.array(k*K(t-d)))
     plt.xlabel("Døgn (" + str(getDate(0, start, sheet)) + "-" + str(getDate(0, slutt, sheet) + ")"))
-    plt.legend(['k*K(t-d)', 'D(t)'])
+    plt.legend(['D(t)', 'k*K(t-d)'])
     plt.title('k: ' + str(k) + '\nd: ' + str(d) + '\nC: ' + str(Cny) + '\niterasjoner: ' + str(iter))
     plt.tight_layout()
     plt.show()
@@ -159,22 +159,14 @@ def plotSteepestDescent(t, periode, start, slutt):
 if __name__ == "__main__":
     findStartDate(sheet)
     findEndDate(sheet)
+    start_time = time.time()
 
-    #k = float(input("Hva er k?"))
-    #d = float(input("Hva er d?"))
+    vektor = np.linspace(start, slutt, 20000)
 
-    vektor = np.linspace(start, slutt, 565)
-
-    getDays(1, 565)
-    getInnlagt(1, 565)
-    getDeaths(1, 565)
+    getDays(0, 609)
+    getInnlagt(0, 609)
+    getDeaths(0, 609)
 
     plotSteepestDescent(vektor, slutt-start+1, start, slutt)
 
-    # print(days)
-    # print(innlagt)
-    # print(deaths)
-    #
-    # plt.plot(vektor, k*K(vektor-d))
-    # plt.plot(vektor, D(vektor))
-    # plt.show()
+    print("--- %s seconds ---" % (time.time()-start_time))

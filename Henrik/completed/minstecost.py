@@ -7,13 +7,13 @@ import time
 
 # Spesifiserer hvilke filer som vi henter data fra
 
-locD = "excel/Covid_deaths.xls"
+locD = "Henrik/excel/Covid_deaths.xls"
 
 wbD = xlrd.open_workbook(locD)
 sheetD = wbD.sheet_by_index(0)
 sheetD.cell_value(0, 0)
 
-loc = "excel/Covid_innlagt.xls"
+loc = "Henrik/excel/Covid_innlagt.xls"
 wb = xlrd.open_workbook(loc)
 sheet = wb.sheet_by_index(0)
 sheet.cell_value(0, 0)
@@ -83,19 +83,19 @@ def K(t):
 def CFunction(vektor, k, d, T):
     kVektor = k * K(vektor - d)
     dVektor = D(vektor)
-    return (np.trapz((kVektor - dVektor) ** 2, vektor)) / (T - d)
+    return (np.trapz((kVektor - dVektor) ** 2, vektor))
 
 
 def plotCostFunction(vektor, periode, iterasjoner, start, slutt):
     # Vektorer med parameterverdier
     global dMin, kMin
-    n = 1600
-    kRange = np.array(np.linspace(0.02, 0.022, n))
-    dRange = np.array(np.linspace(2.8, 2.9, n))
+    n = 500
+    kRange = np.array(np.linspace(0, 0.03, n))
+    dRange = np.array(np.linspace(0, 5, n))
     iter = 0
 
     # Finner minste verdi for C med k og d
-    CMin = 1000000
+    CMin = 1e9
     for k in kRange:
         for d in dRange:
             C = CFunction(vektor, k, d,
@@ -110,8 +110,9 @@ def plotCostFunction(vektor, periode, iterasjoner, start, slutt):
 
     print("Done!")
 
+    print(iterasjoner)
+    plotvektor = np.array(np.linspace(dMin+start, slutt+dMin, iterasjoner))
 
-    plotvektor = np.array(np.linspace(dMin, periode, iterasjoner))
     # Plotter D(t)
     plt.plot(plotvektor, D(plotvektor))
     # Plotter k*K(t-d)
@@ -120,7 +121,7 @@ def plotCostFunction(vektor, periode, iterasjoner, start, slutt):
     print("k-verdien som gir minst C(k,d) er " + str(kMin))
     print("d-verdien som gir minst C(k,d) er " + str(dMin))
     plt.title("k = " + str(kMin) + "\nd = " + str(dMin) + "\nCMin = " + str(CMin))
-    plt.xlabel("Døgn (" + str(getDate(0, start, sheet)) + "-" + str(getDate(0, slutt, sheet) + ")"))
+    #plt.xlabel("Døgn (" + str(getDate(0, start, sheet)) + "-" + str(getDate(0, slutt, sheet) + ")"))
     plt.legend([ 'D(t)', 'k*K(t-d)'])
     plt.tight_layout()
     plt.show()
@@ -128,6 +129,7 @@ def plotCostFunction(vektor, periode, iterasjoner, start, slutt):
 
 
 if __name__ == "__main__":
+
     start_time = time.time()
     # Setter hvilken dag vi ønsker å starte perioden fra
     start = 1
@@ -142,7 +144,8 @@ if __name__ == "__main__":
     iterasjoner = periode * 6
 
     # Oppretter en vektor med parameterene som ble opprettet ovenfor
-    vektor = np.array(np.linspace(0, periode, iterasjoner))
+    vektor = np.array(np.linspace(start, slutt, iterasjoner))
+
 
     # Henter antall dager fra excel ark og legger det i et array
     getDays(start, slutt)
@@ -152,6 +155,7 @@ if __name__ == "__main__":
 
     # Henter antall døde (kumulativt) fra excel ark og legger det i et array
     getDeaths(start, slutt)
+    print(str(K(-2)))
 
     # Starter utregningsprosessen og plottingen av dataene
     plotCostFunction(vektor, periode, iterasjoner, start, slutt)

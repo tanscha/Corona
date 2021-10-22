@@ -89,15 +89,15 @@ def plotting():
 
     ax2.plot(days, kumdeaths, 'b-', markersize=0.1)
 
-    for i_x, i_y in zip(days,
-                        kuminnlagt):  # hentet fra https://stackoverflow.com/questions/52408274/showing-points-coordinate-in-plot-in-python
-        if i_x == 565:
-            ax1.text(i_x, i_y, '({}, {})'.format(i_x, i_y))
-
-    for i_x, i_y in zip(days,
-                        kumdeaths):  # hentet fra https://stackoverflow.com/questions/52408274/showing-points-coordinate-in-plot-in-python
-        if i_x == 565:
-            ax2.text(i_x, i_y, '({}, {})'.format(i_x, i_y))
+    # for i_x, i_y in zip(days,
+    #                     kuminnlagt):  # hentet fra https://stackoverflow.com/questions/52408274/showing-points-coordinate-in-plot-in-python
+    #     if i_x == 565:
+    #         ax1.text(i_x, i_y, '({}, {})'.format(i_x, i_y))
+    #
+    # for i_x, i_y in zip(days,
+    #                     kumdeaths):  # hentet fra https://stackoverflow.com/questions/52408274/showing-points-coordinate-in-plot-in-python
+    #     if i_x == 565:
+    #         ax2.text(i_x, i_y, '({}, {})'.format(i_x, i_y))
 
     plotSettings(fig, ax1, ax2, 'Døgn', 'Innlagte', 'Døde')
 

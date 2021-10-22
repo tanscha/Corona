@@ -3,8 +3,7 @@ import numpy
 import numpy as np
 import xlrd
 
-import interpolation_innlagt
-import interpolation_deaths
+from Henrik.plots import interpolation_deaths, interpolation_innlagt
 
 loc1 = "excel/Covid_innlagt.xls"
 
@@ -52,7 +51,7 @@ def getNumbersDeaths(column):
 
 def costFunction(k_min, t, d):
     xVektor = numpy.array(numpy.linspace(1, 565, 2260))
-    interpolation_innlagt.getInterpInnlagt(xVektor-d)
+    interpolation_innlagt.getInterpInnlagt(xVektor - d)
     kFunction = interpolation_innlagt.f2
 
     interpolation_deaths.getInterpDeaths(xVektor)

@@ -1,7 +1,7 @@
 import xlrd
 import matplotlib.pyplot as plt
 
-loc = "Covid_innlagt.xls"
+loc = "excel/Covid_deaths.xls"
 
 wb = xlrd.open_workbook(loc)
 sheet = wb.sheet_by_index(0)
@@ -50,17 +50,18 @@ def getNumbers(column):
 def plotting():
     fig, ax1 = plt.subplots()
     getDays()
-    innlagte = getNumbers(1)
+    deathts = getNumbers(1)
 
-    ax1.plot(days, innlagte, 'r-', markersize=0.1)
+    ax1.plot(days, deathts, 'r-', markersize=0.1)
 
     ax2 = ax1.twinx()
 
-    innlagte = getNumbers(3)
+    kumdeathts = getNumbers(2)
 
-    ax2.plot(days, innlagte, 'b-', markersize=0.1)
+    ax2.plot(days, kumdeathts, 'b-', markersize=0.1)
 
-    plotSettings(fig, ax1, ax2, 'Døgn', 'Innlagt per døgn', 'Kumulativ innlagt')
+    plotSettings(fig, ax1,ax2, 'Døgn', 'Dødsfall', 'Kumulativt dødsfall')
+
 
 
 if __name__ == "__main__":

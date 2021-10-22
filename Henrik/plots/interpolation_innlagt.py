@@ -2,17 +2,14 @@ import matplotlib.pyplot as plt
 import numpy
 import xlrd
 from scipy import interpolate
-import dødsfall
+import pasienter_innlagt
 
-f2 = 0
-
-deaths = dødsfall.getNumbers(2)
-
-loc = "Covid_deaths.xls"
+loc = "excel/Covid_innlagt.xls"
 
 wb = xlrd.open_workbook(loc)
 sheet = wb.sheet_by_index(0)
 sheet.cell_value(0, 0)
+innlagt = pasienter_innlagt.getNumbers(3)
 
 days = []
 
@@ -23,21 +20,16 @@ def getDays():
         else:
             days.append(i)
 
-def getInterpDeaths(t):
+def getInterpInnlagt():
     getDays()
+    K = interpolate.interp1d(days, innlagt, kind='cubic')
 
-    D = interpolate.interp1d(days, deaths, kind='cubic')
-    print(D(19))
-
-    plt.plot(days, deaths, 'o', t, D(t), '--', markersize=1)
-
-    plt.legend(['data', 'cubic', 'nearest'], loc = 'best')
+    plt.plot(days, innlagt, 'b-', markersize=2)
 
     plt.show()
+    return K
 
-    return D
 
 if __name__ == "__main__":
     xnew = numpy.linspace(1, 565, 2260)
-
-    getInterpDeaths(xnew)
+    getInterpInnlagt()
