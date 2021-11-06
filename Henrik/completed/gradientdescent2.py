@@ -126,13 +126,13 @@ def partialDerivD(t, k, d, T, h):
 
 def plotSteepestDescent(t, periode, start, slutt):
     gammk = 1e-12
-    gammd = 0 #1e-4
+    gammd = 1e-4
     hk = 1e-3
     hd = 0.1
     Cg = 6000
     Cny = 7000
     k = 0.02
-    d = 0 #10
+    d = 5
     iter = 0
 
     while np.abs(Cny-Cg) > 0.000001:
@@ -161,7 +161,7 @@ if __name__ == "__main__":
     findEndDate(sheet)
     start_time = time.time()
 
-    vektor = np.linspace(start, slutt, 20000)
+    vektor = np.linspace(start, slutt, (slutt-start)*24)
 
     getDays(0, 609)
     getInnlagt(0, 609)
