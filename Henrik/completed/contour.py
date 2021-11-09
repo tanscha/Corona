@@ -7,16 +7,18 @@ import re
 import numpy as np
 import xlrd
 import time
+from mpl_toolkits.mplot3d import Axes3D
 
 # Spesifiserer hvilke filer som vi henter data fra
+import scipy.interpolate as interp
+
 k_column, d_column, c_column = [], [], []
-with open('myfile.txt') as f:
+with open('myfile.csv') as f:
     lines = f.readlines()
     for x in lines:
-        k_column.append(x.split(', ')[0])
-        d_column.append(x.split(', ')[1])
-        c_column.append(re.split('\n', x.split(', ')[2])[0])
-    print(c_column)
+        k_column.append(int(x.split(', ')[0]))
+        d_column.append(int(x.split(', ')[1]))
+        c_column.append(float(re.split('\n', x.split(', ')[2])[0]))
     k_column = np.array(k_column)
     d_column = np.array(d_column)
     c_column = np.array(c_column)
@@ -128,12 +130,28 @@ def plotCostFunction(vektor, periode, iterasjoner, start, slutt):
     # #file.close()
     # print(Cmatrix)
 
-    fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
-    ax.plot_trisurf(k_column, d_column, c_column, linewidth=0, antialiased=False)
+
+
+    #https://stackoverflow.com/questions/35259285/plotting-three-lists-as-a-surface-plot-in-python-using-mplot3d
+
+    plotx,ploty, = np.meshgrid(np.linspace(np.min(k_column),np.max(k_column),22500),
+                               np.linspace(np.min(d_column),np.max(d_column),22500))
+    plotz = interp.griddata((k_column,d_column),c_column,(plotx,ploty),method='linear')
+
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+    ax.plot_surface(plotx,ploty,plotz,cstride=1,rstride=1,cmap='viridis')
+
+
+    #fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
+    #ax.plot_trisurf(k_column, d_column, c_column, linewidth=0, antialiased=False)
     plt.show()
 
 
 if __name__ == "__main__":
+    print(f"kcolumn: {k_column.size}")
+    print(f"dcolumn: {d_column.size}")
+    print(f"ccolumn: {c_column.size}")
     start_time = time.time()
     # Setter hvilken dag vi ønsker å starte perioden fra
     start = 1
