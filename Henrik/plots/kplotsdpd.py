@@ -200,35 +200,36 @@ if __name__ == "__main__":
         #findEndDate(sheet)
         start_time = time.time()
         start = 1
-        slutt = 314
+        slutt = 283
 
         vektor = np.linspace(start, slutt, slutt-start+1)
 
         getDays(0, 609)
         getInnlagt(0, 609)
         getDeaths(0, 609)
-        #getKdpd()
-        # for i in vektor:
-        #         print(f'i = {i}')
-        #         t = np.linspace(int(i)-1, int(i)+1, 3)
-        #         print(t)
-        #         plotkdpd(t, slutt - start + 1)
-        #
-        # #vektor = np.linspace(0, 325, 325)
-        # print(kdpd)
-        # plt.plot(vektor, kdpd, 'b-', markersize=0.1)
-
-        start = 315
-        slutt = 608
-
-        kdpd = []
-        vektor = np.linspace(start, slutt, slutt-start+1)
 
         for i in vektor:
                 print(f'i = {i}')
                 t = np.linspace(int(i)-1, int(i)+1, 3)
                 print(t)
-                plotkdpd2021(t, slutt - start + 1)
+                plotkdpd(t, slutt - start + 1)
+
+        #vektor = np.linspace(0, 325, 325)
+        print(kdpd)
+        plt.plot(vektor, kdpd, 'b-', markersize=0.1)
+
+        start = 284
+        slutt = 608
+
+        kdpd = []
+        vektor = np.linspace(start, slutt, slutt-start+1)
+        getKdpd()
+
+        # for i in vektor:
+        #         print(f'i = {i}')
+        #         t = np.linspace(int(i)-1, int(i)+1, 3)
+        #         print(t)
+        #         plotkdpd2021(t, slutt - start + 1)
 
 
         plt.plot(vektor, kdpd, 'b-', markersize=0.1)
