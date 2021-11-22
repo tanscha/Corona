@@ -199,7 +199,7 @@ if __name__ == "__main__":
         #findStartDate(sheet)
         #findEndDate(sheet)
         start_time = time.time()
-        start = 1
+        start = 100
         slutt = 283
 
         vektor = np.linspace(start, slutt, slutt-start+1)
@@ -230,6 +230,7 @@ if __name__ == "__main__":
         #         t = np.linspace(int(i)-1, int(i)+1, 3)
         #         print(t)
         #         plotkdpd2021(t, slutt - start + 1)
+
 
 
         plt.plot(vektor, kdpd, 'b-', markersize=0.1)

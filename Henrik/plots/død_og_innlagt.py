@@ -1,9 +1,9 @@
 import xlrd
 import matplotlib.pyplot as plt
 
-loc = "excel/Covid_deaths.xls"
+loc = "../excel/Covid_deaths.xls"
 
-loc2 = "excel/Covid_innlagt.xls"
+loc2 = "../excel/Covid_innlagt.xls"
 
 wb = xlrd.open_workbook(loc)
 sheet = wb.sheet_by_index(0)
@@ -29,7 +29,7 @@ def getInnlagtNum(i, c):
 
 
 def getDaysInnlagte():
-    for i in range(566):
+    for i in range(315):
         if i < 1:
             print(i)
         else:
@@ -37,7 +37,7 @@ def getDaysInnlagte():
 
 
 def getDaysDøde():
-    for i in range(566):
+    for i in range(315):
         if i < 1:
             print(i)
         else:
@@ -46,7 +46,7 @@ def getDaysDøde():
 
 def getInnlagte(column):
     innlagt = []
-    for i in range(566):
+    for i in range(315):
         if i < 1:
             print(i)
         else:
@@ -57,7 +57,7 @@ def getInnlagte(column):
 
 def getDødsfall(column):
     deaths = []
-    for i in range(566):
+    for i in range(315):
         if i < 1:
             print(i)
         else:
@@ -78,12 +78,12 @@ def plotting():
 
     for i_x, i_y in zip(days,
                         kuminnlagt):  # hentet fra https://stackoverflow.com/questions/52408274/showing-points-coordinate-in-plot-in-python
-        if i_x == 566:
+        if i_x == 315:
             plt.text(i_x, i_y, '({}, {})'.format(i_x, i_y))
 
     for i_x, i_y in zip(days,
                         kumdeaths):  # hentet fra https://stackoverflow.com/questions/52408274/showing-points-coordinate-in-plot-in-python
-        if i_x == 566:
+        if i_x == 315:
             plt.text(i_x, i_y, '({}, {})'.format(i_x, i_y))
 
     plt.xlabel("Døgn (21.02.2020 - 07.09.2021)")

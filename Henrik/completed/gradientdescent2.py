@@ -151,7 +151,8 @@ def plotSteepestDescent(t, periode, start, slutt):
     plt.plot(t, np.array(k*K(t-d)))
     plt.xlabel("Døgn (" + str(getDate(0, start, sheet)) + "-" + str(getDate(0, slutt, sheet) + ")"))
     plt.legend(['D(t)', 'k*K(t-d)'])
-    plt.title('k: ' + str(k) + '\nd: ' + str(d) + '\nC: ' + str(Cny) + '\niterasjoner: ' + str(iter))
+    #plt.title('k: ' + str(k) + '\nd: ' + str(d) + '\nC: ' + str(Cny) + '\niterasjoner: ' + str(iter))
+    plt.title('k: ' + '{0:.3g}'.format(k))
     plt.tight_layout()
     plt.show()
 

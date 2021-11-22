@@ -1,18 +1,24 @@
 import xlrd
 import matplotlib.pyplot as plt
 
-loc = "excel/Covid_innlagt.xls"
+loc = "../excel/Covid_innlagt.xls"
 
 wb = xlrd.open_workbook(loc)
 sheet = wb.sheet_by_index(0)
 sheet.cell_value(0, 0)
+
+loc1 = "../excel/Covid_deaths.xls"
+
+wb = xlrd.open_workbook(loc1)
+sheet1 = wb.sheet_by_index(0)
+sheet1.cell_value(0, 0)
 
 print(sheet.nrows)
 
 days = []
 
 
-def getNum(i, c):
+def getNum(i, c, sheet):
     positiv = int(sheet.cell_value(i, c))
     return positiv
 
@@ -29,37 +35,37 @@ def plotSettings(fig, ax1, ax2, ax1xlabel, ax1ylabel, ax2xlabel):
 
 
 def getDays():
-    for i in range(sheet.nrows):
+    for i in range(315):
         if i < 1:
             print(i)
         else:
             days.append(i)
 
 
-def getNumbers(column):
+def getNumbers(column,sheet):
     innlagt = []
-    for i in range(sheet.nrows):
+    for i in range(315):
         if i < 1:
             print(i)
         else:
-            innlagt.append(getNum(i, column))
+            innlagt.append(getNum(i, column, sheet))
 
     return innlagt
 
 
 def plotting():
+    fig, ax1 = plt.subplots()
     getDays()
-    innlagte = getNumbers(1)
+    innlagte = getNumbers(1,sheet)
 
-    plt.plot(days, innlagte, 'b-', markersize=0.1)
+    plot1, = ax1.plot(days, innlagte, 'r-', markersize=0.1)
 
-    #ax2 = ax1.twinx()
+    ax2 = ax1.twinx()
 
-    #innlagte = getNumbers(3)
+    kumdeathts = getNumbers(2,sheet1)
 
-    #ax2.plot(days, innlagte, 'b-', markersize=0.1)
-
-    #plotSettings(fig, ax1, ax2, 'Døgn', 'Innlagt per døgn', 'Kumulativ innlagt')
+    plot2, = ax2.plot(days, kumdeathts, 'b-', markersize=0.1)
+    plt.legend([plot1, plot2], ["I(t)", "D(t)"])
     plt.show()
 
 if __name__ == "__main__":

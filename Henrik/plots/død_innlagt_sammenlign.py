@@ -1,9 +1,9 @@
 import xlrd
 import matplotlib.pyplot as plt
 
-loc = "excel/Covid_deaths.xls"
+loc = "../excel/Covid_deaths.xls"
 
-loc2 = "excel/Covid_innlagt.xls"
+loc2 = "../excel/Covid_innlagt.xls"
 
 wb = xlrd.open_workbook(loc)
 sheet = wb.sheet_by_index(0)
@@ -39,7 +39,7 @@ def getInnlagtNum(i, c):
 
 
 def getDaysInnlagte():
-    for i in range(566):
+    for i in range(315):
         if i < 1:
             print(i)
         else:
@@ -47,7 +47,7 @@ def getDaysInnlagte():
 
 
 def getDaysDøde():
-    for i in range(566):
+    for i in range(315):
         if i < 1:
             print(i)
         else:
@@ -56,7 +56,7 @@ def getDaysDøde():
 
 def getInnlagte(column):
     innlagt = []
-    for i in range(566):
+    for i in range(315):
         if i < 1:
             print(i)
         else:
@@ -67,7 +67,7 @@ def getInnlagte(column):
 
 def getDødsfall(column):
     deaths = []
-    for i in range(566):
+    for i in range(315):
         if i < 1:
             print(i)
         else:
@@ -99,7 +99,7 @@ def plotting():
     #     if i_x == 565:
     #         ax2.text(i_x, i_y, '({}, {})'.format(i_x, i_y))
 
-    plotSettings(fig, ax1, ax2, 'Døgn', 'Innlagte', 'Døde')
+    plotSettings(fig, ax1, ax2, 'Døgn (21.02.2020-31.12.2020)', 'Innlagte', 'Døde')
 
     #plt.xlabel("Døgn (21.02.2020 - 07.09.2021)")
     #plt.ylabel("Kumulativ innlagte (rød) vs døde (blå)")

@@ -1,9 +1,0 @@
-1. Tall uke for uke / dag for dag
-2. Vaksine-tall
-3. Plot cost-funksjon (n = 150)
-4. Fortsette rapport
-Brute force
-steepest descent
-cost-funksjon
-kurvetilpasning
-minste kvadraters metode
